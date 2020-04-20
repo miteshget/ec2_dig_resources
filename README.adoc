@@ -1,13 +1,40 @@
 EC2 Dig Resources
 ==================
 
-This playbook digs instances, vpc, route records and S3 bucket for specific tag
- 
- 
-. How run playboook
+This playbook digs instances, vpc, route records and S3 bucket for specific tag.
 
- 
-[source,sh]
+* How run playboook
+[source=sh]
 ----
-[user@laptop ~]# ansible-playbook resource_info.yml -e account=awx_profile -e region=ec2-east-1 -e guid=8888
+[user@laptop ~]# ansible-playbook resource_info.yml -e aws_profile=awx_profile_name -e aws_region=us-east-1 -e guid=8888
+----
+
+* Sample Output
+[source=textinfo]
+----
+========= Output Omitted ==========
+
+TASK [debug] ********************************************************************************************************
+ok: [localhost] => {
+    "msg": " VPC ID : [ Not found ]"
+}
+
+TASK [debug] ********************************************************************************************************
+ok: [localhost] => {
+    "msg": "ec2_instances : [ Not found ]"
+}
+
+TASK [debug] ********************************************************************************************************
+ok: [localhost] => {
+    "msg": "S3 Bucket : [ Not found ]"
+}
+
+TASK [debug] ********************************************************************************************************
+ok: [localhost] => {
+    "msg": "Route53 Records : [ Not found ]"
+}
+
+PLAY RECAP **********************************************************************************************************
+localhost                  : ok=9    changed=0    unreachable=0    failed=0    skipped=4    rescued=0    ignored=0
+
 ----
