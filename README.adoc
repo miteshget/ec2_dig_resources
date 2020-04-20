@@ -1,9 +1,10 @@
- == EC2 Dig Resources
+ ==EC2 Dig Resources
  
  This playbook digs instances, vpc, route records and S3 bucket for specific tag
  
  
- . How run playboook
+ .How run playboook
+ +
  [source,sh]
  ----
  [ user@laptop ~]# ansible-playbook resource_info.yml -e account=awx_profile -e region=ec2-east-1 -e guid=8888
