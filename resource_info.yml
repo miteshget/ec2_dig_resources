@@ -1,0 +1,66 @@
+---
+- hosts: localhost
+  tasks:
+
+  - ec2_vpc_net_info:
+      filters:
+        "tag:Name": "{{ ec2_name_prefix }}-vpc"
+      region: "{{ ec2_region }}"
+      profile: "{{ account }}"
+    register: vpc_net_facts
+
+  - name: Print VPC ID
+    when: vpc_net_facts['vpcs']|length > 0
+    set_fact:
+      vpc_name_id: "{{ vpc_net_facts.vpcs[0].vpc_id }}"
+
+  - ec2_instance_info:
+      filters:
+        "tag:Workshop": "{{ ec2_name_prefix }}"
+      region: "{{ ec2_region }}"
+      profile: "{{ account }}"
+    register: ec2_instance
+        
+  - name: Print Instances
+    set_fact: 
+      ec2_instance_list: "{{ ec2_instance_list | d([]) + [ item ] }}"
+    loop: "{{ ec2_instance.instances | map(attribute='tags.Name') |list }}"
+
+  - aws_s3_bucket_info:
+      region: "{{ ec2_region }}"
+      profile: "{{ account }}"
+    register: s3_bucket
+
+  - name: Print S3 Bucket name
+    set_fact: 
+     ec2_s3_bucket: "{{ _bucket.name }}"
+    when: ec2_name_prefix in _bucket.name
+    loop: "{{ s3_bucket.buckets }}"
+    loop_control:
+      loop_var: _bucket
+      label: "{{ _bucket.name }}"
+
+  - route53_info:
+      query: record_sets 
+      hosted_zone_id: Z1TYCDVCKYS6QZ 
+      profile: "{{ account }}"
+    register: route53_list
+
+  - set_fact: 
+      route53_records: "{{ route53_records | d([]) + [ _route53.Name ] }}"
+    when: ec2_name_prefix in _route53.Name
+    loop: "{{ route53_list.ResourceRecordSets }}"
+    loop_control:
+      loop_var: _route53
+      label: "{{ _route53.Name }}"
+
+  - debug: 
+      msg: " VPC ID : [ {{ vpc_name_id | d('Not found')}} ]"
+  - debug: 
+      msg: "ec2_instances : [ {{ ec2_instance_list |d('Not found') }} ]"
+  - debug: 
+      msg: "S3 Bucket : [ {{ ec2_s3_bucket |d('Not found') }} ]"
+  - debug: 
+      msg: "Route53 Records : [ {{ route53_records | d('Not found') }} ]"
+
+
